@@ -1,5 +1,35 @@
+body {
+	display: flex;
+}
+
 #inputCode {
 	width: 40vw;
 	height: 90vh;
 	margin: 5vh
+}
+
+#controls {
+	width: 40vw;
+	height: 90vh;
+	margin: 5vh;
+
+	display: flex;
+	flex-direction: column;
+}
+
+#registers {
+	display: flex;
+}
+
+.register {
+	display: inline-block;
+	margin: 1vh;
+}
+
+.register > input {
+	width: 3vw;
+}
+
+#memoryLocations {
+	display: flex;
 }
