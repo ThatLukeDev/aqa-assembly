@@ -23,7 +23,7 @@ body {
 
 .register {
 	display: inline-block;
-	margin: 1vh;
+	margin: 0.5vh;
 }
 
 .register > input {
@@ -32,4 +32,17 @@ body {
 
 #memoryLocations {
 	display: flex;
+}
+
+.memory {
+	display: inline-block;
+	margin: 0.5vh;
+}
+
+.memory > input {
+	width: 3vw;
+}
+
+.spacer {
+	margin: 1vw;
 }
