@@ -10,6 +10,9 @@ window.onload = () => {
 	cloneEnumeratedInnerElement(document.querySelector(".registers"), 11);
 	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), 99);
 
+	document.querySelectorAll(".register>input").forEach((v) => { console.log(v); v.value = 0; });
+	document.querySelectorAll(".memory>input").forEach((v) => { console.log(v); v.value = 0; });
+
 	let codeInput = document.querySelector("#inputCode");
 
 	let fontSliderInput = document.querySelector("#fontSize>input");
