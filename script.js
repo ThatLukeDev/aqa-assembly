@@ -14,9 +14,11 @@ window.onload = () => {
 
 	let fontSliderInput = document.querySelector("#fontSize>input");
 	let fontSliderText = document.querySelector("#fontSize>a");
+	let highlightText = document.querySelector("#highlights");
 
 	fontSliderInput.onchange = () => {
 		fontSliderText.innerHTML = fontSliderInput.value / 3;
 		codeInput.style = `font-size: ${fontSliderInput.value / 3};`
+		highlightText.style = `font-size: ${fontSliderInput.value / 3};`
 	};
 };

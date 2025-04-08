@@ -55,3 +55,12 @@ body {
 .spacer {
 	margin: 1vw;
 }
+
+#highlights {
+	position: absolute;
+	width: 40vw;
+	height: 90vh;
+	margin: 5.5vh;
+	font-family: monospace;
+	color: red;
+}
