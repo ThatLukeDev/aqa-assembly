@@ -6,7 +6,17 @@ var cloneEnumeratedInnerElement = (element, number) => {
 	}
 };
 
-window.onload = (() => {
-	cloneEnumeratedInnerElement(document.querySelector(".registers"), 10);
-	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), 100);
-});
+window.onload = () => {
+	cloneEnumeratedInnerElement(document.querySelector(".registers"), 11);
+	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), 99);
+
+	let codeInput = document.querySelector("#inputCode");
+
+	let fontSliderInput = document.querySelector("#fontSize>input");
+	let fontSliderText = document.querySelector("#fontSize>a");
+
+	fontSliderInput.onchange = () => {
+		fontSliderText.innerHTML = fontSliderInput.value / 3;
+		codeInput.style = `font-size: ${fontSliderInput.value / 3};`
+	};
+};

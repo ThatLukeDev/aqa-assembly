@@ -3,8 +3,13 @@
 		<title>AQA Assembly Interpreter</title>
 	</head>
 	<body>
-		<textarea id="inputCode"></textarea>
+		<textarea id="inputCode" style="font-size: 20pt;"></textarea>
+
 		<div id="controls">
+			<span id="fontSize">Code font size<input type="range"></input><a>20</a></span>
+		</div>
+
+		<div id="locations">
 			<div class="registers">
 				<span class="register"><input id="registerInput$_"></input><br>R$_</span>
 			</div>
@@ -13,7 +18,7 @@
 				<span class="memory"><input id="memoryInput$_"></input><br>M$_</span>
 			</div>
 			<span class="spacer"></span>
-			<div class="controls">
+			<div class="actualControls">
 			</div>
 		</div>
 	</body>
