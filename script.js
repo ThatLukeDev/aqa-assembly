@@ -176,6 +176,13 @@ window.onload = () => {
 			}
 		}
 
-		console.log(error); // log
+		let highlight = "";
+		for (let i = 0; i < error; i++) {
+			highlight += "_";
+			if ([" ", "\t", "\n"].includes(val[i])) {
+				highlight = highlight.replace(/_/g, "&nbsp;");
+			}
+		}
+		document.querySelector("#highlights").innerHTML = highlight;
 	};
 };
