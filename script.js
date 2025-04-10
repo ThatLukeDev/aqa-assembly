@@ -39,9 +39,9 @@ var cloneEnumeratedInnerElement = (element, number, offset) => {
 	element.innerHTML = "";
 	for (let i = 0; i < number; i++) {
 		element.innerHTML += html.replace(/\$_/g, i);
-		element.onchange = () => {
+		element.oninput = () => {
 			clearTimeout(memoryEventTimeout);
-			setTimeout(changeMemoryEvent, memoryEventTimeout);
+			memoryEventTimeout = setTimeout(changeMemoryEvent, 1000);
 		}
 	}
 };
@@ -63,5 +63,8 @@ window.onload = () => {
 		fontSliderText.innerHTML = fontSliderInput.value / FONTSIZE_SENSITIVITY;
 		codeInput.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
 		highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
+	};
+
+	codeInput.oninput = () => {
 	};
 };
