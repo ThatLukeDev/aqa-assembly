@@ -46,6 +46,15 @@ var cloneEnumeratedInnerElement = (element, number, offset) => {
 	}
 };
 
+class Instruction {
+	type;
+	destination;
+	source;
+	source2;
+	source2isValue;
+	label;
+}
+
 window.onload = () => {
 	cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
 	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), MEMORIES, REGISTERS);
@@ -65,6 +74,28 @@ window.onload = () => {
 		highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
 	};
 
+	var instructions = [];
+
 	codeInput.oninput = () => {
+		let currentStr = "";
+		let currentInstruction = 0;
+		let seperators = [" ", "\t", "\n"];
+
+		for (let i = 0; i < codeInput.value.length; i++) {
+			if (codeInput.value[i] == ";") {
+				seperators = ["\n"];
+			}
+			else if (seperators.includes(codeInput.value[i])) {
+				if (currentStr != "" && seperators.length > 2) {
+					console.log(currentStr);
+				}
+
+				currentStr = "";
+				seperators = [" ", "\t", "\n"];
+			}
+			else {
+				currentStr += codeInput.value[i];
+			}
+		}
 	};
 };
