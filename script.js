@@ -5,6 +5,12 @@ const FONTSIZE_SENSITIVITY = 3;
 
 var memoryEventTimeout = null;
 var memory = new Array(REGISTERS + MEMORIES).fill(0);
+var safeParseInt = (str) => {
+	if (isNaN(str)) {
+		return null;
+	}
+	return parseInt(str);
+};
 var parseByte = (str) => {
 	let num = parseInt(str);
 	if (num < 0) {
@@ -51,7 +57,7 @@ class Instruction {
 	destination;
 	source;
 	source2;
-	source2isValue;
+	value;
 	label;
 }
 
@@ -77,25 +83,99 @@ window.onload = () => {
 	var instructions = [];
 
 	codeInput.oninput = () => {
+		let val = codeInput.value + "\n";
+
 		let currentStr = "";
 		let currentInstruction = 0;
+		let phase = 0;
+		let maxPhase = 10;
 		let seperators = [" ", "\t", "\n"];
+		let error = -1;
 
-		for (let i = 0; i < codeInput.value.length; i++) {
-			if (codeInput.value[i] == ";") {
+		for (let i = 0; i < val.length; i++) {
+			if (val[i] == ";") {
 				seperators = ["\n"];
 			}
-			else if (seperators.includes(codeInput.value[i])) {
+			else if (seperators.includes(val[i])) {
 				if (currentStr != "" && seperators.length > 2) {
-					console.log(currentStr);
+					currentStr = currentStr.toUpperCase();
+					if (phase == 0) {
+						if (!instructions[currentInstruction]) {
+							instructions[currentInstruction] = new Instruction();
+						}
+
+						if (currentStr[currentStr.length - 1] == ":") {
+							instructions[currentInstruction].label = currentStr.slice(0, -1);
+							currentStr = "";
+							continue;
+						}
+
+						if (currentStr == "HALT") {
+							maxPhase = 0;
+						}
+						else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
+							maxPhase = 1;
+						}
+						else if (["LDR", "STR", "MOV", "CMP", "MVN"].includes(currentStr)) {
+							maxPhase = 2;
+						}
+						else if (["ADD", "SUB", "AND", "ORR", "EOR", "LSL", "LSR"].includes(currentStr)) {
+							maxPhase = 3;
+						}
+						else {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].type = currentStr;
+					}
+					else if (phase == 1) {
+						if (currentStr[0] != "R") {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].destination = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+					}
+					else if (phase == 2) {
+						if (currentStr[0] == "R") {
+							instructions[currentInstruction].source = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						}
+						else if (currentStr[0] == "#" && phase == maxPhase) {
+							instructions[currentInstruction].value = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+						}
+						else {
+							error = i;
+							break;
+						}
+					}
+					else if (phase == 3) {
+						if (currentStr[0] == "R") {
+							instructions[currentInstruction].source2 = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						}
+						else if (currentStr[0] == "#" && phase == maxPhase) {
+							instructions[currentInstruction].value = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+						}
+						else {
+							error = i;
+							break;
+						}
+					}
+
+					phase++;
+					if (phase > maxPhase) {
+						console.log(instructions[currentInstruction]); // log
+						phase = 0;
+						currentInstruction++;
+					}
 				}
 
 				currentStr = "";
 				seperators = [" ", "\t", "\n"];
 			}
 			else {
-				currentStr += codeInput.value[i];
+				currentStr += val[i];
 			}
 		}
+
+		console.log(error); // log
 	};
 };
