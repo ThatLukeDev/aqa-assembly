@@ -65,6 +65,13 @@ class Instruction {
 	label;
 }
 
+var instructions = [];
+var pointer = 0;
+
+var step = () => {
+	// TODO
+};
+
 window.onload = () => {
 	cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
 	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), MEMORIES, REGISTERS);
@@ -73,6 +80,10 @@ window.onload = () => {
 	document.querySelectorAll(".memory>input").forEach((v) => { v.value = 0; });
 
 	let codeInput = document.querySelector("#inputCode");
+
+	let stepBtn = document.querySelector("#stepCode");
+	let resetBtn = document.querySelector("#resetCode");
+	let runBtn = document.querySelector("#runCode");
 
 	let fontSliderInput = document.querySelector("#fontSize>input");
 	let fontSliderText = document.querySelector("#fontSize>a");
@@ -84,7 +95,17 @@ window.onload = () => {
 		highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
 	};
 
-	var instructions = [];
+	stepBtn.onclick = () => {
+		step();
+	};
+	resetBtn.onclick = () => {
+		pointer = 0;
+	};
+	runBtn.onclick = () => {
+		while (instructions[pointer] && instructions[pointer].type != "HALT") {
+			step();
+		}
+	};
 
 	codeInput.oninput = () => {
 		let val = codeInput.value + "\n";
@@ -95,6 +116,8 @@ window.onload = () => {
 		let maxPhase = 10;
 		let seperators = [" ", "\t", "\n"];
 		let error = -1;
+
+		instructions = [];
 
 		for (let i = 0; i < val.length; i++) {
 			if (val[i] == ";") {
@@ -191,7 +214,6 @@ window.onload = () => {
 
 					phase++;
 					if (phase > maxPhase) {
-						console.log(instructions[currentInstruction]); // log
 						phase = 0;
 						currentInstruction++;
 					}
