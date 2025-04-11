@@ -89,6 +89,15 @@ var step = () => {
 		case "STR":
 			memory[instruction.value + REGISTERS] = memory[instruction.destination];
 			break;
+		case "ADD":
+			memory[instruction.destination] = memory[instruction.source] + (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			break;
+		case "SUB":
+			memory[instruction.destination] = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			break;
+		case "MOV":
+			memory[instruction.destination] = instruction.value != null ? instruction.value : memory[instruction.source];
+			break;
 	}
 
 	pointer++;
