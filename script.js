@@ -356,6 +356,9 @@ window.onload = () => {
 	};
 	runBtn.onclick = () => {
 		pointer = 0;
+		for (let i = 9; i < REGISTERS; i++) {
+			memory[i] = 0;
+		}
 		while (instructions[pointer] != null && instructions[pointer].type != "HALT") {
 			step();
 		}
