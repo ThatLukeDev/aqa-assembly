@@ -44,6 +44,16 @@ var changeMemoryEvent = () => {
 		memory[REGISTERS + idx] = num;
 	});
 };
+var visualSetChanges = () => {
+	document.querySelectorAll(".register>input").forEach((v) => {
+		let idx = parseInt(v.outerHTML.replace(/.+?Input(\d+).+/, "$1"));
+		v.value = memory[idx];
+	});
+	document.querySelectorAll(".memory>input").forEach((v) => {
+		let idx = parseInt(v.outerHTML.replace(/.+?Input(\d+).+/, "$1"));
+		v.value = memory[REGISTERS + idx];
+	});
+};
 var cloneEnumeratedInnerElement = (element, number, offset) => {
 	let html = element.innerHTML;
 	element.innerHTML = "";
@@ -74,11 +84,16 @@ var step = () => {
 
 	switch (instruction.type) {
 		case "LDR":
-			console.log("ldr");
+			memory[instruction.destination] = memory[instruction.value + REGISTERS];
+			break;
+		case "STR":
+			memory[instruction.value + REGISTERS] = memory[instruction.destination];
 			break;
 	}
 
 	pointer++;
+
+	visualSetChanges();
 };
 
 window.onload = () => {
@@ -188,6 +203,14 @@ window.onload = () => {
 						}
 						else if (currentStr[0] == "#" && phase == maxPhase) {
 							let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+							if (instrVal == null) {
+								error = i;
+								break;
+							}
+							instructions[currentInstruction].value = instrVal;
+						}
+						else if (["LDR", "STR"].includes(instructions[currentInstruction].type)) {
+							let instrVal = safeParseInt(currentStr.replace(/^(\d+),?$/, "$1"));
 							if (instrVal == null) {
 								error = i;
 								break;
