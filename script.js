@@ -77,7 +77,7 @@ class Instruction {
 
 var instructions = [];
 var pointer = 0;
-var comparison = 0;
+var comparison = null;
 
 var step = () => {
 	let instruction = instructions[pointer];
@@ -97,6 +97,9 @@ var step = () => {
 			break;
 		case "MOV":
 			memory[instruction.destination] = instruction.value != null ? instruction.value : memory[instruction.source];
+			break;
+		case "CMP":
+			comparison = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
 			break;
 	}
 
@@ -277,6 +280,7 @@ window.onload = () => {
 			memory[i] = 0;
 		}
 		pointer = 0;
+		comparison = null;
 	};
 	resetRegBtn.onclick = () => {
 		for (let i = 9; i < REGISTERS; i++) {
@@ -285,6 +289,7 @@ window.onload = () => {
 	};
 	resetAllBtn.onclick = () => {
 		pointer = 0;
+		comparison = null;
 		memory = new Array(REGISTERS + MEMORIES).fill(0);
 	};
 	runBtn.onclick = () => {
