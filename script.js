@@ -132,6 +132,30 @@ var step = () => {
 				branch(instruction.value);
 			}
 			break;
+		case "AND":
+			memory[instruction.destination] = memory[instruction.source] & (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
+		case "ORR":
+			memory[instruction.destination] = memory[instruction.source] | (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
+		case "EOR":
+			memory[instruction.destination] = memory[instruction.source] ^ (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
+		case "MVN":
+			memory[instruction.destination] = ~(instruction.value != null ? instruction.value : memory[instruction.source]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
+		case "LSL":
+			memory[instruction.destination] = memory[instruction.source] << (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
+		case "LSR":
+			memory[instruction.destination] = memory[instruction.source] >> (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			memory[instruction.destination] = memory[instruction.destination] & 255;
+			break;
 	}
 
 	pointer++;
