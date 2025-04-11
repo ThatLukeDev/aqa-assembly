@@ -67,9 +67,18 @@ class Instruction {
 
 var instructions = [];
 var pointer = 0;
+var comparison = 0;
 
 var step = () => {
-	// TODO
+	let instruction = instructions[pointer];
+
+	switch (instruction.type) {
+		case "LDR":
+			console.log("ldr");
+			break;
+	}
+
+	pointer++;
 };
 
 window.onload = () => {
@@ -102,7 +111,8 @@ window.onload = () => {
 		pointer = 0;
 	};
 	runBtn.onclick = () => {
-		while (instructions[pointer] && instructions[pointer].type != "HALT") {
+		pointer = 0;
+		while (instructions[pointer] != null && instructions[pointer].type != "HALT") {
 			step();
 		}
 	};
@@ -137,7 +147,7 @@ window.onload = () => {
 							continue;
 						}
 
-						if (currentStr == "HALT") {
+						if (["HALT", "B"].includes(currentStr)) {
 							maxPhase = 0;
 						}
 						else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
@@ -232,6 +242,9 @@ window.onload = () => {
 			highlight += "_";
 			if ([" ", "\t", "\n"].includes(val[i])) {
 				highlight = highlight.replace(/_/g, "&nbsp;");
+				if (val[i] == "\n") {
+					highlight += "<br>";
+				}
 			}
 		}
 		document.querySelector("#highlights").innerHTML = highlight;
