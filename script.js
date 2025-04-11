@@ -28,6 +28,10 @@ var parseByte = (str) => {
 	}
 	return num;
 };
+var setMemoryCookies = () => {
+	document.cookie = `SCRIPT=${btoa(document.querySelector("#inputCode").value)}`;
+	document.cookie = `MEMORY=${btoa(JSON.stringify(memory))}`;
+};
 var changeMemoryEvent = () => {
 	document.querySelectorAll(".register>input").forEach((v) => {
 		let num = parseByte(v.value);
@@ -43,6 +47,7 @@ var changeMemoryEvent = () => {
 		let idx = parseInt(v.outerHTML.replace(/.+?Input(\d+).+/, "$1"));
 		memory[REGISTERS + idx] = num;
 	});
+	setMemoryCookies();
 };
 var visualSetChanges = () => {
 	document.querySelectorAll(".register>input").forEach((v) => {
@@ -53,6 +58,7 @@ var visualSetChanges = () => {
 		let idx = parseInt(v.outerHTML.replace(/.+?Input(\d+).+/, "$1"));
 		v.value = memory[REGISTERS + idx];
 	});
+	setMemoryCookies();
 };
 var cloneEnumeratedInnerElement = (element, number, offset) => {
 	let html = element.innerHTML;
@@ -366,6 +372,16 @@ window.onload = () => {
 
 	codeInput.oninput = () => {
 		checkSyntax(codeInput.value + "\n");
+		setMemoryCookies();
 	};
+
+	if (document.cookie.includes("SCRIPT")) {
+		codeInput.value = atob(document.cookie.replace(/^.*SCRIPT=(.+);.*$/, "$1").replace(/^.*SCRIPT=(.+)$/, "$1"));
+	}
+	if (document.cookie.includes("MEMORY")) {
+		memory = JSON.parse(atob(document.cookie.replace(/^.*MEMORY=(.+);.*$/, "$1").replace(/^.*MEMORY=(.+)$/, "$1")));
+		visualSetChanges();
+	}
+
 	checkSyntax(codeInput.value + "\n");
 };
