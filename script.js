@@ -107,6 +107,8 @@ window.onload = () => {
 
 	let stepBtn = document.querySelector("#stepCode");
 	let resetBtn = document.querySelector("#resetCode");
+	let resetRegBtn = document.querySelector("#resetRegCode");
+	let resetAllBtn = document.querySelector("#resetAllCode");
 	let runBtn = document.querySelector("#runCode");
 
 	let fontSliderInput = document.querySelector("#fontSize>input");
@@ -123,7 +125,19 @@ window.onload = () => {
 		step();
 	};
 	resetBtn.onclick = () => {
+		for (let i = 9; i < REGISTERS; i++) {
+			memory[i] = 0;
+		}
 		pointer = 0;
+	};
+	resetRegBtn.onclick = () => {
+		for (let i = 9; i < REGISTERS; i++) {
+			memory[i] = 0;
+		}
+	};
+	resetAllBtn.onclick = () => {
+		pointer = 0;
+		memory = new Array(REGISTERS + MEMORIES).fill(0);
 	};
 	runBtn.onclick = () => {
 		pointer = 0;
