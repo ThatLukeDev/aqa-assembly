@@ -79,6 +79,14 @@ var instructions = [];
 var pointer = 0;
 var comparison = null;
 
+var branch = (val) => {
+	for (let i = 0; i < instructions.length; i++) {
+		if (instructions[i].label == val) {
+			pointer = i - 1;
+		}
+	}
+};
+
 var step = () => {
 	let instruction = instructions[pointer];
 
@@ -100,6 +108,9 @@ var step = () => {
 			break;
 		case "CMP":
 			comparison = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			break;
+		case "B":
+			branch(instruction.value);
 			break;
 	}
 
@@ -136,13 +147,13 @@ var checkSyntax = (val) => {
 						continue;
 					}
 
-					if (["HALT", "B"].includes(currentStr)) {
+					if (["HALT"].includes(currentStr)) {
 						maxPhase = 0;
 					}
-					else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
+					else if (["B"].includes(currentStr)) {
 						maxPhase = 1;
 					}
-					else if (["LDR", "STR", "MOV", "CMP", "MVN"].includes(currentStr)) {
+					else if (["LDR", "STR", "MOV", "CMP", "MVN", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
 						maxPhase = 2;
 					}
 					else if (["ADD", "SUB", "AND", "ORR", "EOR", "LSL", "LSR"].includes(currentStr)) {
@@ -155,7 +166,11 @@ var checkSyntax = (val) => {
 					instructions[currentInstruction].type = currentStr;
 				}
 				else if (phase == 1) {
-					if (currentStr[0] != "R") {
+					if (instructions[currentInstruction].type == "B") {
+						instructions[currentInstruction].value = currentStr;
+						continue;
+					}
+					else if (currentStr[0] != "R") {
 						error = i;
 						break;
 					}
@@ -167,7 +182,11 @@ var checkSyntax = (val) => {
 					instructions[currentInstruction].destination = instrVal;
 				}
 				else if (phase == 2) {
-					if (currentStr[0] == "R") {
+					if (["BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
+						instructions[currentInstruction].value = currentStr;
+						continue;
+					}
+					else if (currentStr[0] == "R") {
 						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
 						if (instrVal == null || instrVal >= REGISTERS) {
 							error = i;
