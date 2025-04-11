@@ -9,7 +9,11 @@ var safeParseInt = (str) => {
 	if (isNaN(str)) {
 		return null;
 	}
-	return parseInt(str);
+	let val = parseInt(str);
+	if (val > 255 || val < 0) {
+		return null;
+	}
+	return val
 };
 var parseByte = (str) => {
 	let num = parseInt(str);
@@ -133,14 +137,29 @@ window.onload = () => {
 							error = i;
 							break;
 						}
-						instructions[currentInstruction].destination = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						if (instrVal == null || instrVal >= REGISTERS) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].destination = instrVal;
 					}
 					else if (phase == 2) {
 						if (currentStr[0] == "R") {
-							instructions[currentInstruction].source = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+							let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+							if (instrVal == null || instrVal >= REGISTERS) {
+								error = i;
+								break;
+							}
+							instructions[currentInstruction].source = instrVal;
 						}
 						else if (currentStr[0] == "#" && phase == maxPhase) {
-							instructions[currentInstruction].value = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+							let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+							if (instrVal == null) {
+								error = i;
+								break;
+							}
+							instructions[currentInstruction].value = instrVal;
 						}
 						else {
 							error = i;
@@ -149,10 +168,20 @@ window.onload = () => {
 					}
 					else if (phase == 3) {
 						if (currentStr[0] == "R") {
-							instructions[currentInstruction].source2 = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+							let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+							if (instrVal == null || instrVal >= REGISTERS) {
+								error = i;
+								break;
+							}
+							instructions[currentInstruction].source2 = instrVal;
 						}
 						else if (currentStr[0] == "#" && phase == maxPhase) {
-							instructions[currentInstruction].value = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+							let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+							if (instrVal == null) {
+								error = i;
+								break;
+							}
+							instructions[currentInstruction].value = instrVal;
 						}
 						else {
 							error = i;
