@@ -96,6 +96,145 @@ var step = () => {
 	visualSetChanges();
 };
 
+var checkSyntax = (val) => {
+	let currentStr = "";
+	let currentInstruction = 0;
+	let phase = 0;
+	let maxPhase = 10;
+	let seperators = [" ", "\t", "\n"];
+	let error = -1;
+
+	instructions = [];
+
+	for (let i = 0; i < val.length; i++) {
+		if (val[i] == ";") {
+			seperators = ["\n"];
+		}
+		else if (seperators.includes(val[i])) {
+			if (currentStr != "" && seperators.length > 2) {
+				currentStr = currentStr.toUpperCase();
+				if (phase == 0) {
+					if (!instructions[currentInstruction]) {
+						instructions[currentInstruction] = new Instruction();
+					}
+
+					if (currentStr[currentStr.length - 1] == ":") {
+						instructions[currentInstruction].label = currentStr.slice(0, -1);
+						currentStr = "";
+						continue;
+					}
+
+					if (["HALT", "B"].includes(currentStr)) {
+						maxPhase = 0;
+					}
+					else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
+						maxPhase = 1;
+					}
+					else if (["LDR", "STR", "MOV", "CMP", "MVN"].includes(currentStr)) {
+						maxPhase = 2;
+					}
+					else if (["ADD", "SUB", "AND", "ORR", "EOR", "LSL", "LSR"].includes(currentStr)) {
+						maxPhase = 3;
+					}
+					else {
+						error = i;
+						break;
+					}
+					instructions[currentInstruction].type = currentStr;
+				}
+				else if (phase == 1) {
+					if (currentStr[0] != "R") {
+						error = i;
+						break;
+					}
+					let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+					if (instrVal == null || instrVal >= REGISTERS) {
+						error = i;
+						break;
+					}
+					instructions[currentInstruction].destination = instrVal;
+				}
+				else if (phase == 2) {
+					if (currentStr[0] == "R") {
+						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						if (instrVal == null || instrVal >= REGISTERS) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].source = instrVal;
+					}
+					else if (currentStr[0] == "#" && phase == maxPhase) {
+						let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+						if (instrVal == null) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].value = instrVal;
+					}
+					else if (["LDR", "STR"].includes(instructions[currentInstruction].type)) {
+						let instrVal = safeParseInt(currentStr.replace(/^(\d+),?$/, "$1"));
+						if (instrVal == null) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].value = instrVal;
+					}
+					else {
+						error = i;
+						break;
+					}
+				}
+				else if (phase == 3) {
+					if (currentStr[0] == "R") {
+						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						if (instrVal == null || instrVal >= REGISTERS) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].source2 = instrVal;
+					}
+					else if (currentStr[0] == "#" && phase == maxPhase) {
+						let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
+						if (instrVal == null) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].value = instrVal;
+					}
+					else {
+						error = i;
+						break;
+					}
+				}
+
+				phase++;
+				if (phase > maxPhase) {
+					phase = 0;
+					currentInstruction++;
+				}
+			}
+
+			currentStr = "";
+			seperators = [" ", "\t", "\n"];
+		}
+		else {
+			currentStr += val[i];
+		}
+	}
+
+	let highlight = "";
+	for (let i = 0; i < error; i++) {
+		highlight += "_";
+		if ([" ", "\t", "\n"].includes(val[i])) {
+			highlight = highlight.replace(/_/g, "&nbsp;");
+			if (val[i] == "\n") {
+				highlight += "<br>";
+			}
+		}
+	}
+	document.querySelector("#highlights").innerHTML = highlight;
+};
+
 window.onload = () => {
 	cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
 	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), MEMORIES, REGISTERS);
@@ -147,143 +286,7 @@ window.onload = () => {
 	};
 
 	codeInput.oninput = () => {
-		let val = codeInput.value + "\n";
-
-		let currentStr = "";
-		let currentInstruction = 0;
-		let phase = 0;
-		let maxPhase = 10;
-		let seperators = [" ", "\t", "\n"];
-		let error = -1;
-
-		instructions = [];
-
-		for (let i = 0; i < val.length; i++) {
-			if (val[i] == ";") {
-				seperators = ["\n"];
-			}
-			else if (seperators.includes(val[i])) {
-				if (currentStr != "" && seperators.length > 2) {
-					currentStr = currentStr.toUpperCase();
-					if (phase == 0) {
-						if (!instructions[currentInstruction]) {
-							instructions[currentInstruction] = new Instruction();
-						}
-
-						if (currentStr[currentStr.length - 1] == ":") {
-							instructions[currentInstruction].label = currentStr.slice(0, -1);
-							currentStr = "";
-							continue;
-						}
-
-						if (["HALT", "B"].includes(currentStr)) {
-							maxPhase = 0;
-						}
-						else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
-							maxPhase = 1;
-						}
-						else if (["LDR", "STR", "MOV", "CMP", "MVN"].includes(currentStr)) {
-							maxPhase = 2;
-						}
-						else if (["ADD", "SUB", "AND", "ORR", "EOR", "LSL", "LSR"].includes(currentStr)) {
-							maxPhase = 3;
-						}
-						else {
-							error = i;
-							break;
-						}
-						instructions[currentInstruction].type = currentStr;
-					}
-					else if (phase == 1) {
-						if (currentStr[0] != "R") {
-							error = i;
-							break;
-						}
-						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
-						if (instrVal == null || instrVal >= REGISTERS) {
-							error = i;
-							break;
-						}
-						instructions[currentInstruction].destination = instrVal;
-					}
-					else if (phase == 2) {
-						if (currentStr[0] == "R") {
-							let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
-							if (instrVal == null || instrVal >= REGISTERS) {
-								error = i;
-								break;
-							}
-							instructions[currentInstruction].source = instrVal;
-						}
-						else if (currentStr[0] == "#" && phase == maxPhase) {
-							let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
-							if (instrVal == null) {
-								error = i;
-								break;
-							}
-							instructions[currentInstruction].value = instrVal;
-						}
-						else if (["LDR", "STR"].includes(instructions[currentInstruction].type)) {
-							let instrVal = safeParseInt(currentStr.replace(/^(\d+),?$/, "$1"));
-							if (instrVal == null) {
-								error = i;
-								break;
-							}
-							instructions[currentInstruction].value = instrVal;
-						}
-						else {
-							error = i;
-							break;
-						}
-					}
-					else if (phase == 3) {
-						if (currentStr[0] == "R") {
-							let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
-							if (instrVal == null || instrVal >= REGISTERS) {
-								error = i;
-								break;
-							}
-							instructions[currentInstruction].source2 = instrVal;
-						}
-						else if (currentStr[0] == "#" && phase == maxPhase) {
-							let instrVal = safeParseInt(currentStr.replace(/^#(\d+),?$/, "$1"));
-							if (instrVal == null) {
-								error = i;
-								break;
-							}
-							instructions[currentInstruction].value = instrVal;
-						}
-						else {
-							error = i;
-							break;
-						}
-					}
-
-					phase++;
-					if (phase > maxPhase) {
-						phase = 0;
-						currentInstruction++;
-					}
-				}
-
-				currentStr = "";
-				seperators = [" ", "\t", "\n"];
-			}
-			else {
-				currentStr += val[i];
-			}
-		}
-
-		let highlight = "";
-		for (let i = 0; i < error; i++) {
-			highlight += "_";
-			if ([" ", "\t", "\n"].includes(val[i])) {
-				highlight = highlight.replace(/_/g, "&nbsp;");
-				if (val[i] == "\n") {
-					highlight += "<br>";
-				}
-			}
-		}
-		document.querySelector("#highlights").innerHTML = highlight;
+		checkSyntax(codeInput.value + "\n");
 	};
+	checkSyntax(codeInput.value + "\n");
 };
