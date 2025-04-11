@@ -112,6 +112,26 @@ var step = () => {
 		case "B":
 			branch(instruction.value);
 			break;
+		case "BEQ":
+			if (comparison == 0) {
+				branch(instruction.value);
+			}
+			break;
+		case "BNE":
+			if (comparison != 0) {
+				branch(instruction.value);
+			}
+			break;
+		case "BLT":
+			if (comparison > 0) {
+				branch(instruction.value);
+			}
+			break;
+		case "BGT":
+			if (comparison < 0) {
+				branch(instruction.value);
+			}
+			break;
 	}
 
 	pointer++;
@@ -150,10 +170,10 @@ var checkSyntax = (val) => {
 					if (["HALT"].includes(currentStr)) {
 						maxPhase = 0;
 					}
-					else if (["B"].includes(currentStr)) {
+					else if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
 						maxPhase = 1;
 					}
-					else if (["LDR", "STR", "MOV", "CMP", "MVN", "BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
+					else if (["LDR", "STR", "MOV", "CMP", "MVN"].includes(currentStr)) {
 						maxPhase = 2;
 					}
 					else if (["ADD", "SUB", "AND", "ORR", "EOR", "LSL", "LSR"].includes(currentStr)) {
@@ -166,7 +186,7 @@ var checkSyntax = (val) => {
 					instructions[currentInstruction].type = currentStr;
 				}
 				else if (phase == 1) {
-					if (instructions[currentInstruction].type == "B") {
+					if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(instructions[currentInstruction].type)) {
 						instructions[currentInstruction].value = currentStr;
 						continue;
 					}
@@ -182,11 +202,7 @@ var checkSyntax = (val) => {
 					instructions[currentInstruction].destination = instrVal;
 				}
 				else if (phase == 2) {
-					if (["BEQ", "BNE", "BGT", "BLT"].includes(currentStr)) {
-						instructions[currentInstruction].value = currentStr;
-						continue;
-					}
-					else if (currentStr[0] == "R") {
+					if (currentStr[0] == "R") {
 						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
 						if (instrVal == null || instrVal >= REGISTERS) {
 							error = i;
@@ -300,16 +316,19 @@ window.onload = () => {
 		}
 		pointer = 0;
 		comparison = null;
+		visualSetChanges();
 	};
 	resetRegBtn.onclick = () => {
 		for (let i = 9; i < REGISTERS; i++) {
 			memory[i] = 0;
 		}
+		visualSetChanges();
 	};
 	resetAllBtn.onclick = () => {
 		pointer = 0;
 		comparison = null;
 		memory = new Array(REGISTERS + MEMORIES).fill(0);
+		visualSetChanges();
 	};
 	runBtn.onclick = () => {
 		pointer = 0;
