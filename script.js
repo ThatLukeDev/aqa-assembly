@@ -107,7 +107,7 @@ var step = () => {
 			memory[instruction.destination] = instruction.value != null ? instruction.value : memory[instruction.source];
 			break;
 		case "CMP":
-			comparison = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
+			comparison = memory[instruction.destination] - (instruction.value != null ? instruction.value : memory[instruction.source]);
 			break;
 		case "B":
 			branch(instruction.value);
@@ -123,12 +123,12 @@ var step = () => {
 			}
 			break;
 		case "BLT":
-			if (comparison > 0) {
+			if (comparison < 0) {
 				branch(instruction.value);
 			}
 			break;
 		case "BGT":
-			if (comparison < 0) {
+			if (comparison > 0) {
 				branch(instruction.value);
 			}
 			break;
