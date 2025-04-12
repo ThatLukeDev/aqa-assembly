@@ -341,7 +341,7 @@ stepBtn.onclick = () => {
 	step();
 };
 resetBtn.onclick = () => {
-	for (let i = 9; i < REGISTERS; i++) {
+	for (let i = 0; i < REGISTERS; i++) {
 		memory[i] = 0;
 	}
 	pointer = 0;
@@ -349,7 +349,7 @@ resetBtn.onclick = () => {
 	visualSetChanges();
 };
 resetRegBtn.onclick = () => {
-	for (let i = 9; i < REGISTERS; i++) {
+	for (let i = 0; i < REGISTERS; i++) {
 		memory[i] = 0;
 	}
 	visualSetChanges();
@@ -362,7 +362,7 @@ resetAllBtn.onclick = () => {
 };
 runBtn.onclick = () => {
 	pointer = 0;
-	for (let i = 9; i < REGISTERS; i++) {
+	for (let i = 0; i < REGISTERS; i++) {
 		memory[i] = 0;
 	}
 	let iterations = 0;
