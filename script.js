@@ -365,8 +365,14 @@ runBtn.onclick = () => {
 	for (let i = 9; i < REGISTERS; i++) {
 		memory[i] = 0;
 	}
+	let iterations = 0;
 	while (instructions[pointer] != null && instructions[pointer].type != "HALT") {
 		step();
+		iterations++;
+		if (iterations > 1000) {
+			alert("over 1000 iterations, i think ur code is a tad off there mate.");
+			break;
+		}
 	}
 };
 
