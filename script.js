@@ -218,18 +218,19 @@ var checkSyntax = (val) => {
 				else if (phase == 1) {
 					if (["B", "BEQ", "BNE", "BGT", "BLT"].includes(instructions[currentInstruction].type)) {
 						instructions[currentInstruction].value = currentStr;
-						continue;
 					}
-					else if (currentStr[0] != "R") {
-						error = i;
-						break;
+					else {
+						if (currentStr[0] != "R") {
+							error = i;
+							break;
+						}
+						let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
+						if (instrVal == null || instrVal >= REGISTERS) {
+							error = i;
+							break;
+						}
+						instructions[currentInstruction].destination = instrVal;
 					}
-					let instrVal = safeParseInt(currentStr.replace(/^R(\d+),?$/, "$1"));
-					if (instrVal == null || instrVal >= REGISTERS) {
-						error = i;
-						break;
-					}
-					instructions[currentInstruction].destination = instrVal;
 				}
 				else if (phase == 2) {
 					if (currentStr[0] == "R") {
@@ -312,76 +313,74 @@ var checkSyntax = (val) => {
 	document.querySelector("#highlights").innerHTML = highlight;
 };
 
-window.onload = () => {
-	cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
-	cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), MEMORIES, REGISTERS);
+cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
+cloneEnumeratedInnerElement(document.querySelector(".memoryLocations"), MEMORIES, REGISTERS);
 
-	document.querySelectorAll(".register>input").forEach((v) => { v.value = 0; });
-	document.querySelectorAll(".memory>input").forEach((v) => { v.value = 0; });
+document.querySelectorAll(".register>input").forEach((v) => { v.value = 0; });
+document.querySelectorAll(".memory>input").forEach((v) => { v.value = 0; });
 
-	let codeInput = document.querySelector("#inputCode");
+let codeInput = document.querySelector("#inputCode");
 
-	let stepBtn = document.querySelector("#stepCode");
-	let resetBtn = document.querySelector("#resetCode");
-	let resetRegBtn = document.querySelector("#resetRegCode");
-	let resetAllBtn = document.querySelector("#resetAllCode");
-	let runBtn = document.querySelector("#runCode");
+let stepBtn = document.querySelector("#stepCode");
+let resetBtn = document.querySelector("#resetCode");
+let resetRegBtn = document.querySelector("#resetRegCode");
+let resetAllBtn = document.querySelector("#resetAllCode");
+let runBtn = document.querySelector("#runCode");
 
-	let fontSliderInput = document.querySelector("#fontSize>input");
-	let fontSliderText = document.querySelector("#fontSize>a");
-	let highlightText = document.querySelector("#highlights");
+let fontSliderInput = document.querySelector("#fontSize>input");
+let fontSliderText = document.querySelector("#fontSize>a");
+let highlightText = document.querySelector("#highlights");
 
-	fontSliderInput.onchange = () => {
-		fontSliderText.innerHTML = fontSliderInput.value / FONTSIZE_SENSITIVITY;
-		codeInput.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
-		highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
-	};
-
-	stepBtn.onclick = () => {
-		step();
-	};
-	resetBtn.onclick = () => {
-		for (let i = 9; i < REGISTERS; i++) {
-			memory[i] = 0;
-		}
-		pointer = 0;
-		comparison = null;
-		visualSetChanges();
-	};
-	resetRegBtn.onclick = () => {
-		for (let i = 9; i < REGISTERS; i++) {
-			memory[i] = 0;
-		}
-		visualSetChanges();
-	};
-	resetAllBtn.onclick = () => {
-		pointer = 0;
-		comparison = null;
-		memory = new Array(REGISTERS + MEMORIES).fill(0);
-		visualSetChanges();
-	};
-	runBtn.onclick = () => {
-		pointer = 0;
-		for (let i = 9; i < REGISTERS; i++) {
-			memory[i] = 0;
-		}
-		while (instructions[pointer] != null && instructions[pointer].type != "HALT") {
-			step();
-		}
-	};
-
-	codeInput.oninput = () => {
-		checkSyntax(codeInput.value + "\n");
-		setMemoryCookies();
-	};
-
-	if (document.cookie.includes("SCRIPT")) {
-		codeInput.value = atob(document.cookie.replace(/^.*SCRIPT=(.+);.*$/, "$1").replace(/^.*SCRIPT=(.+)$/, "$1"));
-	}
-	if (document.cookie.includes("MEMORY")) {
-		memory = JSON.parse(atob(document.cookie.replace(/^.*MEMORY=(.+);.*$/, "$1").replace(/^.*MEMORY=(.+)$/, "$1")));
-		visualSetChanges();
-	}
-
-	checkSyntax(codeInput.value + "\n");
+fontSliderInput.onchange = () => {
+	fontSliderText.innerHTML = fontSliderInput.value / FONTSIZE_SENSITIVITY;
+	codeInput.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
+	highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
 };
+
+stepBtn.onclick = () => {
+	step();
+};
+resetBtn.onclick = () => {
+	for (let i = 9; i < REGISTERS; i++) {
+		memory[i] = 0;
+	}
+	pointer = 0;
+	comparison = null;
+	visualSetChanges();
+};
+resetRegBtn.onclick = () => {
+	for (let i = 9; i < REGISTERS; i++) {
+		memory[i] = 0;
+	}
+	visualSetChanges();
+};
+resetAllBtn.onclick = () => {
+	pointer = 0;
+	comparison = null;
+	memory = new Array(REGISTERS + MEMORIES).fill(0);
+	visualSetChanges();
+};
+runBtn.onclick = () => {
+	pointer = 0;
+	for (let i = 9; i < REGISTERS; i++) {
+		memory[i] = 0;
+	}
+	while (instructions[pointer] != null && instructions[pointer].type != "HALT") {
+		step();
+	}
+};
+
+codeInput.oninput = () => {
+	checkSyntax(codeInput.value + "\n");
+	setMemoryCookies();
+};
+
+if (document.cookie.includes("SCRIPT")) {
+	codeInput.value = atob(document.cookie.replace(/^.*SCRIPT=(.+);.*$/, "$1").replace(/^.*SCRIPT=(.+)$/, "$1"));
+}
+if (document.cookie.includes("MEMORY")) {
+	memory = JSON.parse(atob(document.cookie.replace(/^.*MEMORY=(.+);.*$/, "$1").replace(/^.*MEMORY=(.+)$/, "$1")));
+	visualSetChanges();
+}
+
+checkSyntax(codeInput.value + "\n");
