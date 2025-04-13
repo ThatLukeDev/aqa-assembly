@@ -1,8 +1,6 @@
 const REGISTERS = 11;
 const MEMORIES = 99;
 
-const FONTSIZE_SENSITIVITY = 3;
-
 var memoryEventTimeout = null;
 var memory = new Array(REGISTERS + MEMORIES).fill(0);
 var safeParseInt = (str) => {
@@ -338,9 +336,9 @@ let fontSliderText = document.querySelector("#fontSize>a");
 let highlightText = document.querySelector("#highlights");
 
 fontSliderInput.onchange = () => {
-	fontSliderText.innerHTML = fontSliderInput.value / FONTSIZE_SENSITIVITY;
-	codeInput.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
-	highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
+	fontSliderText.innerHTML = fontSliderInput.value;
+	codeInput.style.fontSize = `${fontSliderInput.value}pt`;
+	highlightText.style.fontSize = `${fontSliderInput.value}pt`;
 };
 
 stepBtn.onclick = () => {
