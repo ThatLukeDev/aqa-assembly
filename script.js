@@ -29,8 +29,11 @@ var parseByte = (str) => {
 	return num;
 };
 var setMemoryCookies = () => {
-	document.cookie = `SCRIPT=${btoa(document.querySelector("#inputCode").value)}`;
-	document.cookie = `MEMORY=${btoa(JSON.stringify(memory))}`;
+	let date = new Date();
+	date.setTime(date.getTime() + (365*24*60*60*1000));
+	let dateString = date.toUTCString();
+	document.cookie = `SCRIPT=${btoa(document.querySelector("#inputCode").value)}; expires=${dateString}`;
+	document.cookie = `MEMORY=${btoa(JSON.stringify(memory))}; expires=${dateString}`;
 };
 var changeMemoryEvent = () => {
 	document.querySelectorAll(".register>input").forEach((v) => {
