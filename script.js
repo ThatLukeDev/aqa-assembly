@@ -1,8 +1,6 @@
 const REGISTERS = 11;
 const MEMORIES = 99;
 
-const FONTSIZE_SENSITIVITY = 3;
-
 var memoryEventTimeout = null;
 var memory = new Array(REGISTERS + MEMORIES).fill(0);
 var safeParseInt = (str) => {
@@ -29,8 +27,11 @@ var parseByte = (str) => {
 	return num;
 };
 var setMemoryCookies = () => {
-	document.cookie = `SCRIPT=${btoa(document.querySelector("#inputCode").value)}`;
-	document.cookie = `MEMORY=${btoa(JSON.stringify(memory))}`;
+	let date = new Date();
+	date.setTime(date.getTime() + (365*24*60*60*1000));
+	let dateString = date.toUTCString();
+	document.cookie = `SCRIPT=${btoa(document.querySelector("#inputCode").value)}; expires=${dateString}`;
+	document.cookie = `MEMORY=${btoa(JSON.stringify(memory))}; expires=${dateString}`;
 };
 var changeMemoryEvent = () => {
 	document.querySelectorAll(".register>input").forEach((v) => {
@@ -305,13 +306,16 @@ var checkSyntax = (val) => {
 	for (let i = 0; i < error; i++) {
 		highlight += "_";
 		if ([" ", "\t", "\n"].includes(val[i])) {
-			highlight = highlight.replace(/_/g, "&nbsp;");
+			highlight = highlight.replace(/_/g, " ");
 			if (val[i] == "\n") {
-				highlight += "<br>";
+				highlight += "\n";
 			}
 		}
 	}
-	document.querySelector("#highlights").innerHTML = highlight;
+	for (let i = 9; i < 1000; i++) {
+		highlight += "\n";
+	}
+	document.querySelector("#highlights").value = highlight;
 };
 
 cloneEnumeratedInnerElement(document.querySelector(".registers"), REGISTERS, 0);
@@ -336,9 +340,9 @@ let codeSaveBtn = document.querySelector("#saveCode");
 let codeLoadBtn = document.querySelector("#loadCode");
 
 fontSliderInput.onchange = () => {
-	fontSliderText.innerHTML = fontSliderInput.value / FONTSIZE_SENSITIVITY;
-	codeInput.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
-	highlightText.style = `font-size: ${fontSliderInput.value / FONTSIZE_SENSITIVITY};`
+	fontSliderText.innerHTML = fontSliderInput.value;
+	codeInput.style.fontSize = `${fontSliderInput.value}pt`;
+	highlightText.style.fontSize = `${fontSliderInput.value}pt`;
 };
 
 stepBtn.onclick = () => {
@@ -409,6 +413,11 @@ codeLoadBtn.onclick = () => {
 codeInput.oninput = () => {
 	checkSyntax(codeInput.value + "\n");
 	setMemoryCookies();
+};
+
+codeInput.onscroll = () => {
+	highlightText.scrollLeft = codeInput.scrollLeft;
+	highlightText.scrollTop = codeInput.scrollTop;
 };
 
 if (document.cookie.includes("SCRIPT")) {

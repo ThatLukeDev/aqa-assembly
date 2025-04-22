@@ -59,6 +59,9 @@ body {
 #highlights {
 	position: absolute;
 	pointer-events: none;
+	background: transparent;
+	outline: none;
+	border: none;
 	width: 40vw;
 	height: 90vh;
 	margin: 5.75vh;
