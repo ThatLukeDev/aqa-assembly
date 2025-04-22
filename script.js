@@ -106,11 +106,11 @@ var step = () => {
 			break;
 		case "ADD":
 			memory[instruction.destination] = memory[instruction.source] + (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] %= 256;
+			memory[instruction.destination] &= 255;
 			break;
 		case "SUB":
 			memory[instruction.destination] = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] %= 256;
+			memory[instruction.destination] &= 255;
 			break;
 		case "MOV":
 			memory[instruction.destination] = instruction.value != null ? instruction.value : memory[instruction.source];
