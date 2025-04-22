@@ -8,7 +8,7 @@ var safeParseInt = (str) => {
 		return null;
 	}
 	let val = parseInt(str);
-	if (val > (2**16-1) || val < 0) {
+	if (val > 65535 || val < 0) {
 		return null;
 	}
 	return val
@@ -18,8 +18,8 @@ var parseByte = (str) => {
 	if (num < 0) {
 		num = 0;
 	}
-	if (num > (2**16-1)) {
-		num = (2**16-1);
+	if (num > 65535) {
+		num = 65535;
 	}
 	if (num != num) {
 		num = 0;
@@ -106,11 +106,11 @@ var step = () => {
 			break;
 		case "ADD":
 			memory[instruction.destination] = memory[instruction.source] + (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] &= 2 ^ 16 - 1;
+			memory[instruction.destination] &= 65535;
 			break;
 		case "SUB":
 			memory[instruction.destination] = memory[instruction.source] - (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] &= 2 ^ 16 - 1;
+			memory[instruction.destination] &= 65535;
 			break;
 		case "MOV":
 			memory[instruction.destination] = instruction.value != null ? instruction.value : memory[instruction.source];
@@ -143,27 +143,27 @@ var step = () => {
 			break;
 		case "AND":
 			memory[instruction.destination] = memory[instruction.source] & (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 		case "ORR":
 			memory[instruction.destination] = memory[instruction.source] | (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 		case "EOR":
 			memory[instruction.destination] = memory[instruction.source] ^ (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 		case "MVN":
 			memory[instruction.destination] = ~(instruction.value != null ? instruction.value : memory[instruction.source]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 		case "LSL":
 			memory[instruction.destination] = memory[instruction.source] << (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 		case "LSR":
 			memory[instruction.destination] = memory[instruction.source] >> (instruction.value != null ? instruction.value : memory[instruction.source2]);
-			memory[instruction.destination] = memory[instruction.destination] & (2**16-1);
+			memory[instruction.destination] = memory[instruction.destination] & 65535;
 			break;
 	}
 
@@ -369,7 +369,6 @@ resetAllBtn.onclick = () => {
 };
 runBtn.onclick = () => {
 	changeMemoryEvent();
-	visualSetChanges();
 	pointer = 0;
 	for (let i = 0; i < REGISTERS; i++) {
 		memory[i] = 0;
