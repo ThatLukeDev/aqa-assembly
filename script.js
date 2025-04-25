@@ -1,5 +1,5 @@
-const REGISTERS = 11;
-const MEMORIES = 99;
+const REGISTERS = 10;
+const MEMORIES = 100;
 
 var memoryEventTimeout = null;
 var memory = new Array(REGISTERS + MEMORIES).fill(0);
