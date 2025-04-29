@@ -58,6 +58,7 @@ body {
 
 #highlights {
 	position: absolute;
+	overflow: hidden;
 	pointer-events: none;
 	background: transparent;
 	outline: none;
