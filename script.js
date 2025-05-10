@@ -1,5 +1,5 @@
-const REGISTERS = 11;
-const MEMORIES = 99;
+const REGISTERS = 10;
+const MEMORIES = 100;
 
 var memoryEventTimeout = null;
 var memory = new Array(REGISTERS + MEMORIES).fill(0);
@@ -72,6 +72,7 @@ var cloneEnumeratedInnerElement = (element, number, offset) => {
 		}
 	}
 };
+var saveCode
 
 class Instruction {
 	type;
@@ -337,6 +338,9 @@ let fontSliderInput = document.querySelector("#fontSize>input");
 let fontSliderText = document.querySelector("#fontSize>a");
 let highlightText = document.querySelector("#highlights");
 
+let codeSaveBtn = document.querySelector("#saveCode");
+let codeLoadBtn = document.querySelector("#loadCode");
+
 fontSliderInput.onchange = () => {
 	fontSliderText.innerHTML = fontSliderInput.value;
 	codeInput.style.fontSize = `${fontSliderInput.value}pt`;
@@ -383,6 +387,32 @@ runBtn.onclick = () => {
 		}
 	}
 };
+codeSaveBtn.onclick = () => {
+    const codeContent = document.querySelector("#inputCode").value;
+    const blob = new Blob([codeContent], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "code.txt";
+    link.click();
+    URL.revokeObjectURL(link.href);
+};
+codeLoadBtn.onclick = () => {
+	const input = document.createElement("input");
+	input.type = "file";
+	input.accept = ".txt";
+	input.onchange = (event) => {
+		const file = event.target.files[0];
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			codeInput.value = e.target.result;
+			checkSyntax(codeInput.value + "\n");
+			setMemoryCookies();
+		};
+		reader.readAsText(file);
+	};
+	input.click();
+};
+
 
 codeInput.oninput = () => {
 	checkSyntax(codeInput.value + "\n");
