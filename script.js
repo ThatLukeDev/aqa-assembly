@@ -182,7 +182,6 @@ var checkSyntax = (val) => {
 	let error = -1;
 
 	instructions = [];
-	let currentBegin = -1;
 	let currentEnd = -1;
 	for (let i = 0; i < val.length; i++) {
 		if (val[i] == ";") {
@@ -203,8 +202,7 @@ var checkSyntax = (val) => {
 					}
 
 					if (currentInstruction == pointer) {
-						currentBegin = i;
-						currentEnd = i + currentStr.length;
+						currentEnd = i;
 					}
 
 					if (["HALT"].includes(currentStr)) {
@@ -312,7 +310,7 @@ var checkSyntax = (val) => {
 
 	let highlight = "";
 	if (error == -1) {
-		error = currentEnd - 3;
+		error = currentEnd;
 		document.querySelector("#highlights").style.color = "green";
 	}
 	else {
