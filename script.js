@@ -60,6 +60,7 @@ var visualSetChanges = () => {
 		v.value = memory[REGISTERS + idx];
 	});
 	setMemoryCookies();
+	checkSyntax(codeInput.value + "\n");
 };
 var cloneEnumeratedInnerElement = (element, number, offset) => {
 	let html = element.innerHTML;
@@ -181,7 +182,8 @@ var checkSyntax = (val) => {
 	let error = -1;
 
 	instructions = [];
-
+	let currentBegin = -1;
+	let currentEnd = -1;
 	for (let i = 0; i < val.length; i++) {
 		if (val[i] == ";") {
 			seperators = ["\n"];
@@ -198,6 +200,11 @@ var checkSyntax = (val) => {
 						instructions[currentInstruction].label = currentStr.slice(0, -1);
 						currentStr = "";
 						continue;
+					}
+
+					if (currentInstruction == pointer) {
+						currentBegin = i;
+						currentEnd = i + currentStr.length;
 					}
 
 					if (["HALT"].includes(currentStr)) {
@@ -304,6 +311,13 @@ var checkSyntax = (val) => {
 	}
 
 	let highlight = "";
+	if (error == -1) {
+		error = currentEnd - 3;
+		document.querySelector("#highlights").style.color = "green";
+	}
+	else {
+		document.querySelector("#highlights").style.color = "red";
+	}
 	for (let i = 0; i < error; i++) {
 		highlight += "_";
 		if ([" ", "\t", "\n"].includes(val[i])) {
